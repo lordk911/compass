@@ -83,7 +83,7 @@ public class TestCustomConfig {
 
     @Test
     public void testParseRuleLog3() {
-        Map<String, Object> m = jdbcTemplate.queryForMap("select * from t_ds_task_instance where id=284");
+        Map<String, Object> m = jdbcTemplate.queryForMap("select * from t_ds_task_instance where id=847277");
         System.out.println(m);
 
         List<String> paths = new ArrayList<>();

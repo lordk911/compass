@@ -5,16 +5,16 @@ spring:
       strict: false
       datasource:
         diagnose:
-          url: jdbc:mysql://localhost:33066/compass?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&tinyInt1isBit=false
+          url: jdbc:mysql://10.0.105.240:3306/compass?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&tinyInt1isBit=false
           username: root
-          password: root
+          password: passok
         source:
-          url: jdbc:mysql://10.177.162.27:33066/dolphinscheduler?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&tinyInt1isBit=false
-          username: root
-          password: root
+          url: jdbc:mysql://10.0.105.240:3306/dolphinscheduler?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai&tinyInt1isBit=false
+          username: repl_user
+          password: password#123
 
   kafka:
-    bootstrap-servers: localhost:9095
+    bootstrap-servers: host-10-0-105-243:6667,host-10-0-105-246:6667,host-10-0-105-250:6667
     topics: mysqldata
     consumer:
       group-id: task-syncer-ds

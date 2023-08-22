@@ -7,15 +7,15 @@ spring:
   profiles:
     active: hadoop
   datasource:
-    url: jdbc:mysql://localhost:33066/diagnose_data?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.0.105.240:3306/compass?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-    password: root
+    password: passok
     druid:
       initial-size: 5 # 连接池初始化大小
       min-idle: 10 # 最小空闲连接数
       max-active: 20 # 最大连接数
   kafka:
-    bootstrap-servers: "localhost:9095"
+    bootstrap-servers: "host-10-0-105-243:6667,host-10-0-105-246:6667,host-10-0-105-250:6667"
     topics: "task-instance"
     consumer:
       group-id: "cp-task-application"
@@ -23,7 +23,7 @@ spring:
       max-poll-interval-ms: 300000  # 两次消费活跃时间间隔5min
   redis:
     cluster:
-      nodes: localhost:6379
+      nodes: 10.0.68.165:30001,10.0.68.165:30002,10.0.68.165:30003
       max-redirects: 3
     lettuce:
       pool:
@@ -47,6 +47,7 @@ custom:
         # log_path: ../logs/6354680786144_1/3/4.log
         - { "column": "", "data": "/flume/dolphinscheduler" } # 配置存储调度日志的hdfs根目录
         - { "column": "end_time", "regex": "^.*(?<date>\\d{4}-\\d{2}-\\d{2}).+$", "name": "date" }
+        - { "column": "", "data": "data/soft/dolphinscheduler-2.0.5/logs" }
         - { "column": "log_path", "regex": "^.*logs/(?<logpath>.*)$", "name": "logpath" }
       extractLog: # 根据组装的日志路径解析日志
         regex: "^.*Submitted application (?<applicationId>application_[0-9]+_[0-9]+).*$"     # 匹配规则

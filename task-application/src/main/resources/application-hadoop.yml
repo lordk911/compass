@@ -1,13 +1,12 @@
 hadoop:
   namenodes:
-    - nameservices: logs-hdfs
-      namenodesAddr: [ "host1", "host2" ]
-      namenodes: ["namenode1", "namenode2"]
-      # Optional
+    - nameservices: nsdev
+      namenodesAddr: [ "hdpdev248.glodondg.com", "hdpdev244.glodondg.com" ]
+      namenodes: [ "nn1", "nn2" ]
       user: hdfs
-      # Optional
       password:
       port: 8020
+      # scheduler platform hdfs log path keyword identification, used by task-application
       matchPathKeys: [ "flume" ]
       # kerberos
       enableKerberos: false
@@ -19,3 +18,11 @@ hadoop:
       loginUser: ""
       # /var/kerberos/krb5kdc/admin.keytab
       keytabPath: ""
+
+  yarn:
+    - clusterName: "bigdata"
+      resourceManager: [ "hdpdev244.glodondg.com:8088", "hdpdev248.glodondg.com:8088" ]
+      jobHistoryServer: "hdpdev244.glodondg.com:19888"
+
+  spark:
+    sparkHistoryServer: [ "hdpdev248.glodondg.com:18081" ]

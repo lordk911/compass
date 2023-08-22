@@ -1,14 +1,14 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:33066/diagnose_data?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+    url: jdbc:mysql://10.0.105.240:3306/compass?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
     username: root
-    password: root
+    password: passok
     druid:
       initial-size: 5
       min-idle: 10
       max-active: 20
   kafka:
-    bootstrap-servers: "localhost:9095"
+    bootstrap-servers: "host-10-0-105-243:6667,host-10-0-105-246:6667,host-10-0-105-250:6667"
     topics: "task-instance"
     consumer:
       group-id: "cp-task-application"
@@ -17,7 +17,7 @@ spring:
     taskApplicationTopic: "task-application"
   redis:
     cluster:
-      nodes: localhost:6379
+      nodes: 10.0.68.165:30001,10.0.68.165:30002,10.0.68.165:30003
       max-redirects: 3
     password:
     lettuce:
