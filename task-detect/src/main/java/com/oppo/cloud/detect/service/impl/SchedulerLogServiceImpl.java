@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Implementation of scheduling log interface.
@@ -44,10 +45,37 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
     @Autowired
     private TaskApplicationMapper taskApplicationMapper;
 
-
     @Override
     public List<String> getSchedulerLog(String projectName, String flowName, String taskName, Date executionDate,
                                         Integer tryNum) {
+        int maxRetries = 3;
+        long delayMs = 1000; // 1 second delay
+
+        for (int attempt = 0; attempt < maxRetries; attempt++) {
+            List<String> result = tryGetSchedulerLog(projectName, flowName, taskName, executionDate, tryNum);
+            if (result != null) {
+                return result;
+            }
+
+            if (attempt < maxRetries - 1) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(delayMs);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.error("Sleep interrupted", e);
+                }
+                log.info("Retrying getSchedulerLog (attempt {}/{})", attempt + 2, maxRetries);
+            }
+        }
+
+        log.error(
+                "Failed to find scheduler log after {} attempts. taskName:{}, flowName:{}, executionDate:{}, tryNum:{}",
+                maxRetries, taskName, flowName, executionDate, tryNum);
+        return null;
+    }
+
+    private List<String> tryGetSchedulerLog(String projectName, String flowName, String taskName, Date executionDate,
+                                            Integer tryNum) {
         TaskApplicationExample taskApplicationExample = new TaskApplicationExample();
         taskApplicationExample.createCriteria()
                 .andProjectNameEqualTo(projectName)
@@ -73,9 +101,6 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
                 return Arrays.asList(taskApplication.getLogPath().split(","));
             }
         }
-        log.error(
-                "can not find scheduler log from task_application,taskName:{},flowName:{}, executionDate:{}, tryNum:{}",
-                taskName, flowName, executionDate, tryNum);
         return null;
     }
 }
