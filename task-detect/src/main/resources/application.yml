@@ -51,7 +51,7 @@ custom:
     processing: "{lua}:detected:processing"
   delayedTaskQueue:
     enable: true
-    delayedSeconds: 10
+    delayedSeconds: 60
     tryTimes: 5
   opensearch:
     yarn-app-index: "compass-yarn-app"
@@ -71,7 +71,7 @@ custom:
     # Configuration for long running time, in hours.
     durationWarning: 2
     # Configuration for long-term failure, in days.
-    alwaysFailedWarning: 10
+    alwaysFailedWarning: 5
 
 spark:
   io:

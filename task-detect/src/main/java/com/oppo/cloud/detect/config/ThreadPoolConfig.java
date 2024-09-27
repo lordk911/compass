@@ -39,9 +39,9 @@ public class ThreadPoolConfig {
     public Executor detectExecutorPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(8);
+        executor.setMaxPoolSize(16);
         executor.setKeepAliveSeconds(120);
-        executor.setQueueCapacity(500);
+        executor.setQueueCapacity(2000);
         executor.setThreadNamePrefix("detect-executor-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setWaitForTasksToCompleteOnShutdown(true);
@@ -57,9 +57,9 @@ public class ThreadPoolConfig {
     public Executor delayQueueExecutorPool() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(4);
-        executor.setMaxPoolSize(8);
+        executor.setMaxPoolSize(16);
         executor.setKeepAliveSeconds(120);
-        executor.setQueueCapacity(500);
+        executor.setQueueCapacity(2000);
         executor.setThreadNamePrefix("delay-queue-executor-");
         executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
         executor.setWaitForTasksToCompleteOnShutdown(true);

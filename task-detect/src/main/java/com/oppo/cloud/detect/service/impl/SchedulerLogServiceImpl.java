@@ -48,8 +48,8 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
     @Override
     public List<String> getSchedulerLog(String projectName, String flowName, String taskName, Date executionDate,
                                         Integer tryNum) {
-        int maxRetries = 3;
-        long delayMs = 1000; // 1 second delay
+        int maxRetries = 5;
+        long delayMs = 60000; // 1 second delay
 
         for (int attempt = 0; attempt < maxRetries; attempt++) {
             List<String> result = tryGetSchedulerLog(projectName, flowName, taskName, executionDate, tryNum);
