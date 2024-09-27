@@ -81,13 +81,9 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
                 .andProjectNameEqualTo(projectName)
                 .andFlowNameEqualTo(flowName)
                 .andTaskNameEqualTo(taskName)
-                .andExecuteTimeEqualTo(new java.sql.Timestamp(executionDate.getTime()));
+                .andExecuteTimeEqualTo(executionDate);
         List<TaskApplication> taskApplicationList =
                 taskApplicationMapper.selectByExampleWithBLOBs(taskApplicationExample);
-        
-        log.debug("Query parameters: projectName={}, flowName={}, taskName={}, executionDate={}, tryNum={}",
-                  projectName, flowName, taskName, executionDate, tryNum);
-        log.debug("Query result size: {}", taskApplicationList.size());
         
         if (taskApplicationList.size() != 0) {
             TaskApplication taskApplication = null;

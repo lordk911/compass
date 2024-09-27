@@ -260,7 +260,7 @@ public class TaskAppServiceImpl implements TaskAppService {
                 .andProjectNameEqualTo(projectName)
                 .andFlowNameEqualTo(flowName)
                 .andTaskNameEqualTo(taskName)
-                .andExecuteTimeEqualTo(new java.sql.Timestamp(executionTime.getTime()))
+                .andExecuteTimeEqualTo(executionTime)
                 .andApplicationIdIsNotNull();
         return taskApplicationMapper.selectByExample(taskApplicationExample);
     }
