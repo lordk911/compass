@@ -124,6 +124,12 @@ public class TaskAppServiceImpl implements TaskAppService {
             exceptionInfo.append(String.format("can not find appId by tryNum: %s", String.join(",", notFound)));
         }
         abnormalTaskAppInfo.setTaskAppList(taskAppList);
+//        if (!"SUB_PROCESS".equalsIgnoreCase(jobAnalysis.getTaskType())
+//            && !"DEPENDENT".equalsIgnoreCase(jobAnalysis.getTaskType())
+//            && !"SQL".equalsIgnoreCase(jobAnalysis.getTaskType())
+//            && !"SWITCH".equalsIgnoreCase(jobAnalysis.getTaskType())) {
+//            abnormalTaskAppInfo.setExceptionInfo(exceptionInfo.toString());
+//        }
         abnormalTaskAppInfo.setExceptionInfo(exceptionInfo.toString());
         abnormalTaskAppInfo.setHandleApps(handledAppsNew.toString());
         return abnormalTaskAppInfo;

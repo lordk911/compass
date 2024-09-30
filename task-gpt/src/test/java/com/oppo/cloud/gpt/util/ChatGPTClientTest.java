@@ -16,14 +16,47 @@
 
 package com.oppo.cloud.gpt.util;
 
+import com.oppo.cloud.gpt.util.ChatGPTClient;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
-public class ChatGPTClientTest {
+import static org.junit.jupiter.api.Assertions.*;
+
+class ChatGPTClientTest {
+
+    private ChatGPTClient chatGPTClient;
+    private static final String TEST_API_KEY = "sk-123";
+    private static final String TEST_PROXY = "http://10.9.27.41:9997/";
+    private static final String TEST_MODEL = "qwen2-7B-instruct";
+
+    @BeforeEach
+    void setUp() {
+        List<String> apiKeys = Arrays.asList(TEST_API_KEY);
+        chatGPTClient = new ChatGPTClient(apiKeys, TEST_PROXY, TEST_MODEL);
+    }
 
     @Test
-    public void completions() {
+    void testCompletions() {
+        String prompt = "You are a helpful assistant.";
+        String text = "What is the capital of France?";
 
+        String result = chatGPTClient.completions(prompt, text);
+
+        assertNotNull(result);
+        assertFalse(result.isEmpty());
+        // You might want to add more specific assertions based on the expected response
+    }
+
+    @Test
+    void testCompletionsWithEmptyResponse() {
+        String prompt = "You are a helpful assistant.";
+        String text = "Generate an empty response.";
+
+        String result = chatGPTClient.completions(prompt, text);
+
+        assertEquals("", result);
     }
 }
