@@ -143,7 +143,7 @@ public class YarnMetaServiceImpl implements ITaskSyncerMetaService {
 
         for (BulkItemResponse r : responses) {
             if (r.isFailed()) {
-                log.error("failedInsertApp:{},{}", r.getId(), r.status());
+                log.error("failedInsertApp:{},{},{}", r.getId(), r.status(), r.getFailureMessage());
             }
         }
 
