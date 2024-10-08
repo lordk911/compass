@@ -65,6 +65,8 @@ public class RedisConsumer implements CommandLineRunner {
 
     @PostConstruct
     void init() {
+        log.info("LogRecordList key: {}", config.getLogRecordList());
+        log.info("ProcessingHash key: {}", config.getProcessingHash());
         // Reload interrupted task
         Map<Object, Object> processingMap = null;
         try {
