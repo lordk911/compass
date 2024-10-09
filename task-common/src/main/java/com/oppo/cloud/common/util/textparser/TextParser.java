@@ -64,11 +64,11 @@ public class TextParser implements ITextParser {
         blockEnd = null;
     }
 
-    public TextParser(List<ParserAction> actions) {
+    public TextParser(List<ParserAction> actons) {
         this.state = PositionState.HEAD;
         if (actions != null) {
-            actions.sort(Comparator.comparing(ParserAction::getStep));
-            this.actions = actions;
+            this.actions = new ArrayList<>(actions); // Create a new list
+            this.actions.sort(Comparator.comparing(ParserAction::getStep));
         }
         matchActions = new HashMap<>();
         blocks = new ArrayList<>();
