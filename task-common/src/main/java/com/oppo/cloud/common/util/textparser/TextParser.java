@@ -64,7 +64,7 @@ public class TextParser implements ITextParser {
         blockEnd = null;
     }
 
-    public TextParser(List<ParserAction> actons) {
+    public TextParser(List<ParserAction> actions) {
         this.state = PositionState.HEAD;
         if (actions != null) {
             this.actions = new ArrayList<>(actions); // Create a new list
