@@ -1,3 +1,5 @@
 23/06/08 19:24:12 INFO org.apache.spark.SparkException: Job aborted due to stage failure: Could not execute broadcast in 300 secs: java
 23/06/08 19:24:34 INFO org.apache.spark.SparkException: Job aborted due to stage failure: File does not exist some info
 23/06/08 19:24:55 INFO org.apache.spark.SparkException: Job aborted due to stage failure: Total size of serialized results of 9478 tasks (1024.1 MiB) is bigger than spark.driver.maxResultSize (1024.0 MiB)
+24/10/09 14:30:25 ERROR PolicyRefresher: class org.apache.spark.sql.catalyst.plans.logical.ShowNamespaces is not supported yet. Please contact datahub team for further support.
+end
