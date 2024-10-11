@@ -22,12 +22,13 @@ import com.oppo.cloud.common.domain.job.LogRecord;
 import com.oppo.cloud.parser.domain.job.CommonResult;
 import com.oppo.cloud.parser.domain.job.ParserParam;
 import com.oppo.cloud.parser.service.ParamUtil;
+import com.oppo.cloud.parser.utils.ResourcePreparer;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.Map;
 
-class SchedulerLogParserTest {
+class SchedulerLogParserTest extends ResourcePreparer {
 
     @Test
     void run() {

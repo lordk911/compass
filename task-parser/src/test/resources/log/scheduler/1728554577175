@@ -1,0 +1,367 @@
+[LOG-PATH]: /data/soft/dolphinscheduler-2.0.5/logs/15092524943104_1/2831392/12503043.log, [HOST]:  10.0.161.29
+[INFO] 2024-10-10 17:30:37.655 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[76] - python task params {"resourceList":[],"localParams":[],"rawScript":"# coding=utf-8\n\"\"\"\n    @Author：zhuzq-a\n    @date：2024/09/25\n    @description： 权益认证平台行为数据\n\"\"\"\nfrom pyspark.sql import SparkSession\nfrom Crypto.Cipher import AES\nimport base64\nimport requests\nimport json\nimport datetime\nimport os\n\n\ndef decode(encrypted_data):\n    key = b'gldkhyyzxgdddddd'\n    encrypted_data_bytes = base64.b64decode(encrypted_data)\n    cipher = AES.new(key, AES.MODE_ECB)\n    decrypted_data = cipher.decrypt(encrypted_data_bytes)\n    def unpad(s):\n        return s[:-ord(s[len(s) - 1:])]\n    decrypted_data = unpad(decrypted_data).decode('utf-8')\n    return decrypted_data        \n        \ndef spark_connent():\n    global spark\n\n    pythonenv = \"spark-hub\"\n    # driver python\n    os.environ['PYSPARK_DRIVER_PYTHON'] = \"/data/miniconda3/envs/\" + pythonenv + \"/bin/python\"\n    # executor python\n    os.environ['PYSPARK_PYTHON'] = \"./\" + pythonenv + \"_zip/\" + pythonenv + \"/bin/python\"\n    os.environ['HADOOP_CONF_DIR'] = \"/etc/hadoop/conf\"\n    os.environ['SPARK_HOME'] = \"/data/soft/spark3\"\n    # packaged python env location and expend\n    archives = \"hdfs:///share/archives/python3/\" + pythonenv + \".zip#\" + pythonenv + \"_zip\"\n    jars = \"hdfs:///share/sparkjars/*\"\n\n    spark = SparkSession \\\n        .builder \\\n        .appName(\"jmg_birthday_data\") \\\n        .config(\"spark.yarn.dist.archives\", archives) \\\n        .config(\"spark.yarn.jars\", jars) \\\n        .config(\"spark.submit.deployMode\", 'client') \\\n        .config(\"spark.executor.instances\", 4) \\\n        .enableHiveSupport() \\\n        .getOrCreate()\n\n\ndef fetch_url(url,data):\n    try:\n        # 如果响应状态码不是200，将抛出HTTPError异常\n        print(url)\n        headers = {\n            'Content-Type': 'application/json'\n        }\n        response = requests.post(url, json=data, headers=headers)\n        return response.json()\n    except requests.RequestException as e:\n        # 捕获请求异常\n        print(f\"请求出现异常：{e}\")\n    except requests.HTTPError as e:\n        # 捕获HTTP错误\n        print(f\"请求的URL返回了错误响应：{e}\")\n    except requests.ConnectionError as e:\n        # 捕获连接错误\n        print(f\"连接失败：{e}\")\n    except requests.Timeout as e:\n        # 捕获请求超时\n        print(f\"请求超时：{e}\")\n    except requests.URLRequired as e:\n        # 捕获缺少URL\n        print(f\"缺少URL：{e}\")\n    except requests.TooManyRedirects as e:\n        # 捕获重定向过多\n        print(f\"重定向过多：{e}\")\n    # 如果发生异常，返回None\n    return None\n    \n\n\ndef get_schoolhug_logistic_data():\n    schoolhug_logistic_data_list = []\n    url = 'https://glodon.schoolhug.club/api/logistic/data'\n    params = {\n        \"pagesize\": 1000,\n        \"pagenum\": 1\n    }\n    raw = fetch_url(url, params)\n    data = raw[\"data\"][\"data\"]\n    pages =  raw[\"data\"][\"pages\"]\n    for i in data:\n        d =decode(i)\n        dd = json.loads(d)\n        c =  (dd['lgId'],dd['lgNumber'],dd['lock'],dd['phoneNumber'],dd['response'])\n        schoolhug_logistic_data_list.append(c)\n    \n    \n    for p in range(2, pages+1):\n        params = {'pagesize': 1000,'pagenum': p}\n        raw = fetch_url(url, params)\n        data = raw[\"data\"][\"data\"]\n        for i in data:\n            d =decode(i)\n            dd = json.loads(d)\n            c =  (dd['lgId'],dd['lgNumber'],dd['lock'],dd['phoneNumber'],dd['response'])\n            schoolhug_logistic_data_list.append(c)\n\n    schoolhug_logistic_data = spark.createDataFrame(schoolhug_logistic_data_list)\n    schoolhug_logistic_data.registerTempTable(\"ods_schoolhug_logistic_data\")\n    insert_sql = 'insert overwrite table ods.ods_schoolhug_logistic_data select * from ods_schoolhug_logistic_data'\n    spark.sql(insert_sql)\n\n\nif __name__ == '__main__':\n    spark_connent()\n    get_schoolhug_logistic_data()\n    spark.stop()\n    print(datetime.datetime.now())\n        ","dependence":{},"conditionResult":{"successNode":[],"failedNode":[]},"waitStartTimeout":{},"switchResult":{}}
+[INFO] 2024-10-10 17:30:37.656 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[218] - raw python script : # coding=utf-8
+"""
+    @Author：zhuzq-a
+    @date：2024/09/25
+    @description： 权益认证平台行为数据
+"""
+from pyspark.sql import SparkSession
+from Crypto.Cipher import AES
+import base64
+import requests
+import json
+import datetime
+import os
+
+
+def decode(encrypted_data):
+    key = b'gldkhyyzxgdddddd'
+    encrypted_data_bytes = base64.b64decode(encrypted_data)
+    cipher = AES.new(key, AES.MODE_ECB)
+    decrypted_data = cipher.decrypt(encrypted_data_bytes)
+    def unpad(s):
+        return s[:-ord(s[len(s) - 1:])]
+    decrypted_data = unpad(decrypted_data).decode('utf-8')
+    return decrypted_data        
+        
+def spark_connent():
+    global spark
+
+    pythonenv = "spark-hub"
+    # driver python
+    os.environ['PYSPARK_DRIVER_PYTHON'] = "/data/miniconda3/envs/" + pythonenv + "/bin/python"
+    # executor python
+    os.environ['PYSPARK_PYTHON'] = "./" + pythonenv + "_zip/" + pythonenv + "/bin/python"
+    os.environ['HADOOP_CONF_DIR'] = "/etc/hadoop/conf"
+    os.environ['SPARK_HOME'] = "/data/soft/spark3"
+    # packaged python env location and expend
+    archives = "hdfs:///share/archives/python3/" + pythonenv + ".zip#" + pythonenv + "_zip"
+    jars = "hdfs:///share/sparkjars/*"
+
+    spark = SparkSession \
+        .builder \
+        .appName("jmg_birthday_data") \
+        .config("spark.yarn.dist.archives", archives) \
+        .config("spark.yarn.jars", jars) \
+        .config("spark.submit.deployMode", 'client') \
+        .config("spark.executor.instances", 4) \
+        .enableHiveSupport() \
+        .getOrCreate()
+
+
+def fetch_url(url,data):
+    try:
+        # 如果响应状态码不是200，将抛出HTTPError异常
+        print(url)
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.post(url, json=data, headers=headers)
+        return response.json()
+    except requests.RequestException as e:
+        # 捕获请求异常
+        print(f"请求出现异常：{e}")
+    except requests.HTTPError as e:
+        # 捕获HTTP错误
+        print(f"请求的URL返回了错误响应：{e}")
+    except requests.ConnectionError as e:
+        # 捕获连接错误
+        print(f"连接失败：{e}")
+    except requests.Timeout as e:
+        # 捕获请求超时
+        print(f"请求超时：{e}")
+    except requests.URLRequired as e:
+        # 捕获缺少URL
+        print(f"缺少URL：{e}")
+    except requests.TooManyRedirects as e:
+        # 捕获重定向过多
+        print(f"重定向过多：{e}")
+    # 如果发生异常，返回None
+    return None
+    
+
+
+def get_schoolhug_logistic_data():
+    schoolhug_logistic_data_list = []
+    url = 'https://glodon.schoolhug.club/api/logistic/data'
+    params = {
+        "pagesize": 1000,
+        "pagenum": 1
+    }
+    raw = fetch_url(url, params)
+    data = raw["data"]["data"]
+    pages =  raw["data"]["pages"]
+    for i in data:
+        d =decode(i)
+        dd = json.loads(d)
+        c =  (dd['lgId'],dd['lgNumber'],dd['lock'],dd['phoneNumber'],dd['response'])
+        schoolhug_logistic_data_list.append(c)
+    
+    
+    for p in range(2, pages+1):
+        params = {'pagesize': 1000,'pagenum': p}
+        raw = fetch_url(url, params)
+        data = raw["data"]["data"]
+        for i in data:
+            d =decode(i)
+            dd = json.loads(d)
+            c =  (dd['lgId'],dd['lgNumber'],dd['lock'],dd['phoneNumber'],dd['response'])
+            schoolhug_logistic_data_list.append(c)
+
+    schoolhug_logistic_data = spark.createDataFrame(schoolhug_logistic_data_list)
+    schoolhug_logistic_data.registerTempTable("ods_schoolhug_logistic_data")
+    insert_sql = 'insert overwrite table ods.ods_schoolhug_logistic_data select * from ods_schoolhug_logistic_data'
+    spark.sql(insert_sql)
+
+
+if __name__ == '__main__':
+    spark_connent()
+    get_schoolhug_logistic_data()
+    spark.stop()
+    print(datetime.datetime.now())
+        
+[INFO] 2024-10-10 17:30:37.657 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[171] - tenantCode :bigtop, task dir:/tmp/dolphinscheduler/exec/process/3755309710848/15092524943104_1/2831392/12503043
+[INFO] 2024-10-10 17:30:37.657 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[174] - generate python script file:/tmp/dolphinscheduler/exec/process/3755309710848/15092524943104_1/2831392/12503043/py_2831392_12503043.py
+[INFO] 2024-10-10 17:30:37.657 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[181] - #-*- encoding=utf8 -*-
+
+
+# coding=utf-8
+"""
+    @Author：zhuzq-a
+    @date：2024/09/25
+    @description： 权益认证平台行为数据
+"""
+from pyspark.sql import SparkSession
+from Crypto.Cipher import AES
+import base64
+import requests
+import json
+import datetime
+import os
+
+
+def decode(encrypted_data):
+    key = b'gldkhyyzxgdddddd'
+    encrypted_data_bytes = base64.b64decode(encrypted_data)
+    cipher = AES.new(key, AES.MODE_ECB)
+    decrypted_data = cipher.decrypt(encrypted_data_bytes)
+    def unpad(s):
+        return s[:-ord(s[len(s) - 1:])]
+    decrypted_data = unpad(decrypted_data).decode('utf-8')
+    return decrypted_data        
+        
+def spark_connent():
+    global spark
+
+    pythonenv = "spark-hub"
+    # driver python
+    os.environ['PYSPARK_DRIVER_PYTHON'] = "/data/miniconda3/envs/" + pythonenv + "/bin/python"
+    # executor python
+    os.environ['PYSPARK_PYTHON'] = "./" + pythonenv + "_zip/" + pythonenv + "/bin/python"
+    os.environ['HADOOP_CONF_DIR'] = "/etc/hadoop/conf"
+    os.environ['SPARK_HOME'] = "/data/soft/spark3"
+    # packaged python env location and expend
+    archives = "hdfs:///share/archives/python3/" + pythonenv + ".zip#" + pythonenv + "_zip"
+    jars = "hdfs:///share/sparkjars/*"
+
+    spark = SparkSession \
+        .builder \
+        .appName("jmg_birthday_data") \
+        .config("spark.yarn.dist.archives", archives) \
+        .config("spark.yarn.jars", jars) \
+        .config("spark.submit.deployMode", 'client') \
+        .config("spark.executor.instances", 4) \
+        .enableHiveSupport() \
+        .getOrCreate()
+
+
+def fetch_url(url,data):
+    try:
+        # 如果响应状态码不是200，将抛出HTTPError异常
+        print(url)
+        headers = {
+            'Content-Type': 'application/json'
+        }
+        response = requests.post(url, json=data, headers=headers)
+        return response.json()
+    except requests.RequestException as e:
+        # 捕获请求异常
+        print(f"请求出现异常：{e}")
+    except requests.HTTPError as e:
+        # 捕获HTTP错误
+        print(f"请求的URL返回了错误响应：{e}")
+    except requests.ConnectionError as e:
+        # 捕获连接错误
+        print(f"连接失败：{e}")
+    except requests.Timeout as e:
+        # 捕获请求超时
+        print(f"请求超时：{e}")
+    except requests.URLRequired as e:
+        # 捕获缺少URL
+        print(f"缺少URL：{e}")
+    except requests.TooManyRedirects as e:
+        # 捕获重定向过多
+        print(f"重定向过多：{e}")
+    # 如果发生异常，返回None
+    return None
+    
+
+
+def get_schoolhug_logistic_data():
+    schoolhug_logistic_data_list = []
+    url = 'https://glodon.schoolhug.club/api/logistic/data'
+    params = {
+        "pagesize": 1000,
+        "pagenum": 1
+    }
+    raw = fetch_url(url, params)
+    data = raw["data"]["data"]
+    pages =  raw["data"]["pages"]
+    for i in data:
+        d =decode(i)
+        dd = json.loads(d)
+        c =  (dd['lgId'],dd['lgNumber'],dd['lock'],dd['phoneNumber'],dd['response'])
+        schoolhug_logistic_data_list.append(c)
+    
+    
+    for p in range(2, pages+1):
+        params = {'pagesize': 1000,'pagenum': p}
+        raw = fetch_url(url, params)
+        data = raw["data"]["data"]
+        for i in data:
+            d =decode(i)
+            dd = json.loads(d)
+            c =  (dd['lgId'],dd['lgNumber'],dd['lock'],dd['phoneNumber'],dd['response'])
+            schoolhug_logistic_data_list.append(c)
+
+    schoolhug_logistic_data = spark.createDataFrame(schoolhug_logistic_data_list)
+    schoolhug_logistic_data.registerTempTable("ods_schoolhug_logistic_data")
+    insert_sql = 'insert overwrite table ods.ods_schoolhug_logistic_data select * from ods_schoolhug_logistic_data'
+    spark.sql(insert_sql)
+
+
+if __name__ == '__main__':
+    spark_connent()
+    get_schoolhug_logistic_data()
+    spark.stop()
+    print(datetime.datetime.now())
+        
+[INFO] 2024-10-10 17:30:37.658 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[86] - tenantCode user:bigtop, task dir:2831392_12503043
+[INFO] 2024-10-10 17:30:37.658 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[91] - create command file:/tmp/dolphinscheduler/exec/process/3755309710848/15092524943104_1/2831392/12503043/2831392_12503043.command
+[INFO] 2024-10-10 17:30:37.658 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[117] - command : #!/bin/sh
+BASEDIR=$(cd `dirname $0`; pwd)
+cd $BASEDIR
+source /data/soft/dolphinscheduler-2.0.5/conf/env/dolphinscheduler_env.sh
+python /tmp/dolphinscheduler/exec/process/3755309710848/15092524943104_1/2831392/12503043/py_2831392_12503043.py
+[INFO] 2024-10-10 17:30:37.661 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[315] - task run command: sudo -u bigtop sh /tmp/dolphinscheduler/exec/process/3755309710848/15092524943104_1/2831392/12503043/2831392_12503043.command
+[INFO] 2024-10-10 17:30:37.661 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[178] - process start, process id is: 265271
+[INFO] 2024-10-10 17:30:38.662 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> welcome to use bigdata scheduling system...
+[INFO] 2024-10-10 17:30:40.662 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> Setting default log level to "WARN".
+	To adjust logging level use sc.setLogLevel(newLevel). For SparkR, use setLogLevel(newLevel).
+[INFO] 2024-10-10 17:30:41.663 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 24/10/10 17:30:41 WARN Utils: Service 'SparkUI' could not bind on port 4040. Attempting port 4041.
+	24/10/10 17:30:41 WARN Utils: Service 'SparkUI' could not bind on port 4041. Attempting port 4042.
+	24/10/10 17:30:41 WARN Utils: Service 'SparkUI' could not bind on port 4042. Attempting port 4043.
+	24/10/10 17:30:41 WARN Utils: Service 'SparkUI' could not bind on port 4043. Attempting port 4044.
+	24/10/10 17:30:41 WARN Utils: Service 'SparkUI' could not bind on port 4044. Attempting port 4045.
+	24/10/10 17:30:41 WARN Utils: Service 'SparkUI' could not bind on port 4045. Attempting port 4046.
+[INFO] 2024-10-10 17:30:42.664 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 24/10/10 17:30:41 WARN DFSUtilClient: Namenode for nsdev remains unresolved for ID nn1. Check your hdfs-site.xml file to ensure namenodes are configured properly.
+	24/10/10 17:30:41 WARN DFSUtilClient: Namenode for nsdev remains unresolved for ID nn2. Check your hdfs-site.xml file to ensure namenodes are configured properly.
+	24/10/10 17:30:42 WARN DFSUtilClient: Namenode for nsdev remains unresolved for ID nn1. Check your hdfs-site.xml file to ensure namenodes are configured properly.
+	24/10/10 17:30:42 WARN DFSUtilClient: Namenode for nsdev remains unresolved for ID nn2. Check your hdfs-site.xml file to ensure namenodes are configured properly.
+[INFO] 2024-10-10 17:30:43.665 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 24/10/10 17:30:42 WARN DFSUtilClient: Namenode for nsdev remains unresolved for ID nn1. Check your hdfs-site.xml file to ensure namenodes are configured properly.
+	24/10/10 17:30:42 WARN DFSUtilClient: Namenode for nsdev remains unresolved for ID nn2. Check your hdfs-site.xml file to ensure namenodes are configured properly.
+	24/10/10 17:30:42 WARN DFSUtilClient: Namenode for nsdev remains unresolved for ID nn1. Check your hdfs-site.xml file to ensure namenodes are configured properly.
+	24/10/10 17:30:42 WARN DFSUtilClient: Namenode for nsdev remains unresolved for ID nn2. Check your hdfs-site.xml file to ensure namenodes are configured properly.
+[INFO] 2024-10-10 17:30:54.666 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 24/10/10 17:30:54 ERROR PolicyRefresher: failed to save policies to cache file '/policycache/spark/sparkSql_hadoop_prd_hive.json'
+	java.io.FileNotFoundException: /policycache/spark/sparkSql_hadoop_prd_hive.json (Permission denied)
+		at java.io.FileOutputStream.open0(Native Method)
+		at java.io.FileOutputStream.open(FileOutputStream.java:270)
+		at java.io.FileOutputStream.<init>(FileOutputStream.java:213)
+		at java.io.FileOutputStream.<init>(FileOutputStream.java:162)
+		at java.io.FileWriter.<init>(FileWriter.java:90)
+		at org.apache.ranger.plugin.util.PolicyRefresher.saveToCache(PolicyRefresher.java:392)
+		at org.apache.ranger.plugin.util.PolicyRefresher.loadPolicy(PolicyRefresher.java:210)
+		at org.apache.ranger.plugin.util.PolicyRefresher.startRefresher(PolicyRefresher.java:149)
+		at org.apache.ranger.plugin.service.RangerBasePlugin.init(RangerBasePlugin.java:222)
+		at org.apache.kyuubi.plugin.spark.authz.ranger.SparkRangerAdminPlugin$.initialize(SparkRangerAdminPlugin.scala:70)
+		at org.apache.kyuubi.plugin.spark.authz.ranger.RangerSparkExtension.<init>(RangerSparkExtension.scala:41)
+		at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+		at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+		at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+		at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+		at org.apache.spark.sql.SparkSession$.$anonfun$applyExtensions$1(SparkSession.scala:1222)
+		at org.apache.spark.sql.SparkSession$.$anonfun$applyExtensions$1$adapted(SparkSession.scala:1219)
+		at scala.collection.mutable.ResizableArray.foreach(ResizableArray.scala:62)
+		at scala.collection.mutable.ResizableArray.foreach$(ResizableArray.scala:55)
+		at scala.collection.mutable.ArrayBuffer.foreach(ArrayBuffer.scala:49)
+		at org.apache.spark.sql.SparkSession$.org$apache$spark$sql$SparkSession$$applyExtensions(SparkSession.scala:1219)
+		at org.apache.spark.sql.SparkSession.<init>(SparkSession.scala:106)
+		at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+		at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:62)
+		at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+		at java.lang.reflect.Constructor.newInstance(Constructor.java:423)
+		at py4j.reflection.MethodInvoker.invoke(MethodInvoker.java:247)
+		at py4j.reflection.ReflectionEngine.invoke(ReflectionEngine.java:357)
+		at py4j.Gateway.invoke(Gateway.java:238)
+		at py4j.commands.ConstructorCommand.invokeConstructor(ConstructorCommand.java:80)
+		at py4j.commands.ConstructorCommand.execute(ConstructorCommand.java:69)
+		at py4j.ClientServerConnection.waitForCommands(ClientServerConnection.java:182)
+		at py4j.ClientServerConnection.run(ClientServerConnection.java:106)
+		at java.lang.Thread.run(Thread.java:748)
+[INFO] 2024-10-10 17:31:12.669 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 24/10/10 17:31:11 WARN SQLConf: The SQL config 'spark.sql.adaptive.coalescePartitions.minPartitionNum' has been deprecated in Spark v3.2 and may be removed in the future. Use 'spark.sql.adaptive.coalescePartitions.minPartitionSize' instead.
+	24/10/10 17:31:11 WARN SQLConf: The SQL config 'spark.sql.adaptive.coalescePartitions.minPartitionNum' has been deprecated in Spark v3.2 and may be removed in the future. Use 'spark.sql.adaptive.coalescePartitions.minPartitionSize' instead.
+[INFO] 2024-10-10 17:31:17.669 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 24/10/10 17:31:16 WARN SQLConf: The SQL config 'spark.sql.adaptive.coalescePartitions.minPartitionNum' has been deprecated in Spark v3.2 and may be removed in the future. Use 'spark.sql.adaptive.coalescePartitions.minPartitionSize' instead.
+	24/10/10 17:31:17 WARN HiveClientImpl: Detected HiveConf hive.execution.engine is 'tez' and will be reset to 'mr' to disable useless hive logic
+[INFO] 2024-10-10 17:31:18.670 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> ANTLR Tool version 4.9.3 used for code generation does not match the current runtime version 4.8ANTLR Runtime version 4.9.3 used for parser compilation does not match the current runtime version 4.8ANTLR Tool version 4.9.3 used for code generation does not match the current runtime version 4.8ANTLR Runtime version 4.9.3 used for parser compilation does not match the current runtime version 4.8SLF4J: Failed to load class "org.slf4j.impl.StaticLoggerBinder".
+	SLF4J: Defaulting to no-operation (NOP) logger implementation
+	SLF4J: See http://www.slf4j.org/codes.html#StaticLoggerBinder for further details.
+	24/10/10 17:31:17 WARN HiveConf: HiveConf of name hive.metastore.uri.selection does not exist
+	24/10/10 17:31:17 WARN HiveConf: HiveConf of name hive.tez.cartesian-product.enabled does not exist
+[INFO] 2024-10-10 17:31:19.671 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 24/10/10 17:31:18 ERROR DatasetExtractor: class org.apache.spark.sql.execution.command.CreateViewCommand is not supported yet. Please contact datahub team for further support. 
+	24/10/10 17:31:19 ERROR DatasetExtractor: class org.apache.spark.sql.catalyst.plans.logical.Project is not supported yet. Please contact datahub team for further support. 
+	24/10/10 17:31:19 ERROR DatasetExtractor: class org.apache.spark.sql.execution.LogicalRDD is not supported yet. Please contact datahub team for further support. 
+[INFO] 2024-10-10 17:31:20.672 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 
+	[Stage 0:>                                                          (0 + 0) / 4]
+	
+	[Stage 0:>                                                          (0 + 4) / 4]
+[INFO] 2024-10-10 17:31:23.673 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> 
+	[Stage 0:=============================>                             (2 + 2) / 4]
+	
+	[Stage 0:============================================>              (3 + 1) / 4]
+	
+	                                                                                
+[INFO] 2024-10-10 17:31:25.489 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[202] - process has exited, execute path:/tmp/dolphinscheduler/exec/process/3755309710848/15092524943104_1/2831392/12503043, processId:265271 ,exitStatusCode:0 ,processWaitForStatus:true ,processExitValue:0
+[INFO] 2024-10-10 17:31:25.674 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[66] -  -> /data/miniconda3/envs/spark-hub/lib/python3.8/site-packages/requests/__init__.py:89: RequestsDependencyWarning: urllib3 (2.2.1) or chardet (3.0.4) doesn't match a supported version!
+	  warnings.warn("urllib3 ({}) or chardet ({}) doesn't match a supported "
+	/data/miniconda3/envs/spark-hub/lib/python3.8/site-packages/pyspark/sql/dataframe.py:229: FutureWarning: Deprecated in 2.0, use createOrReplaceTempView instead.
+	  warnings.warn("Deprecated in 2.0, use createOrReplaceTempView instead.", FutureWarning)
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	https://glodon.schoolhug.club/api/logistic/data
+	2024-10-10 17:31:25.380822
+[INFO] 2024-10-10 17:31:26.674 TaskLogLogger-class org.apache.dolphinscheduler.plugin.task.python.PythonTask:[60] - FINALIZE_SESSION

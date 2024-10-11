@@ -120,7 +120,8 @@ public class ParamUtil extends ResourcePreparer {
         LogPath scheduler = new LogPath();
         scheduler.setProtocol("hdfs");
         scheduler.setLogType("scheduler");
-        scheduler.setLogPath("hdfs://logs-hdfs/scheduler/2");
+        //scheduler.setLogPath("hdfs://logs-hdfs/scheduler/2");
+        scheduler.setLogPath("hdfs://localhost:8020/log/scheduler");
         scheduler.setLogPathType(LogPathType.DIRECTORY);
 
         List<LogPath> schedulerList = new ArrayList<>();
