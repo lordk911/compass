@@ -52,16 +52,16 @@ custom:
   opensearch:
     logIndex:
       name: "compass-log-summary"
-      shards: 10
-      replicas: 2
+      shards: 1
+      replicas: 0
     appIndex:
       name: "compass-task-app"
-      shards: 10
-      replicas: 2
+      shards: 1
+      replicas: 0
     jobIndex:
       name: "compass-job-analysis"
-      shards: 10
-      replicas: 2
+      shards: 1
+      replicas: 0
     detectIndex:
       name: "compass-detector-app"
     gcIndex:
@@ -72,16 +72,16 @@ custom:
       name: "compass-spark-app"
     jobInstanceIndex:
       name: "compass-job-instance"
-      shards: 10
-      replicas: 2
+      shards: 1
+      replicas: 0
     flinkReportIndex:
       name: "compass-flink-report"
-      shards: 10
-      replicas: 2
+      shards: 1
+      replicas: 0
     flinkTaskAnalysisIndex:
       name: "compass-flink-task-analysis"
-      shards: 10
-      replicas: 2
+      shards: 1
+      replicas: 0
 
   redis:
     logRecordKey: "{lua}:log:record"
