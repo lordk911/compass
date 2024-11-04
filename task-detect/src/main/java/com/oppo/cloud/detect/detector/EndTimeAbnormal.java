@@ -49,24 +49,27 @@ public class EndTimeAbnormal extends DetectServiceImpl {
 
     @Override
     public void detect(JobAnalysis jobAnalysis) throws Exception {
-        // Failed tasks are not subject to runtime duration detection.
-        if (jobAnalysis.getTaskState().equals(TaskStateEnum.fail.name())) {
-            return;
-        }
-        double[] normalValue = getEndTimeBaseline(jobAnalysis);
-        if (normalValue == null) {
-            return;
-        }
-        double normalEndDateBegin = normalValue[0];
-        double normalEndDateEnd = normalValue[1];
-        long endTimeTimestamp = jobAnalysis.getEndTime().getTime() / 1000;
-        String normalEndDateBeginStr = DetectorUtil.timeStampToStr((long) normalEndDateBegin, "yyyy-MM-dd HH:mm:ss");
-        String normalEndDateEndStr = DetectorUtil.timeStampToStr((long) normalEndDateEnd, "yyyy-MM-dd HH:mm:ss");
-        jobAnalysis.setEndTimeBaseline(normalEndDateEndStr);
-        if (endTimeTimestamp > normalEndDateEnd || endTimeTimestamp < normalEndDateBegin) {
-            jobAnalysis.getCategories().add(JobCategoryEnum.endTimeAbnormal.name());
-            genBaselineTree(jobAnalysis);
-        }
+        // TODO Local adaptation problem. Temporarily disabled
+        return;
+
+//        // Failed tasks are not subject to runtime duration detection.
+//        if (jobAnalysis.getTaskState().equals(TaskStateEnum.fail.name())) {
+//            return;
+//        }
+//        double[] normalValue = getEndTimeBaseline(jobAnalysis);
+//        if (normalValue == null) {
+//            return;
+//        }
+//        double normalEndDateBegin = normalValue[0];
+//        double normalEndDateEnd = normalValue[1];
+//        long endTimeTimestamp = jobAnalysis.getEndTime().getTime() / 1000;
+//        String normalEndDateBeginStr = DetectorUtil.timeStampToStr((long) normalEndDateBegin, "yyyy-MM-dd HH:mm:ss");
+//        String normalEndDateEndStr = DetectorUtil.timeStampToStr((long) normalEndDateEnd, "yyyy-MM-dd HH:mm:ss");
+//        jobAnalysis.setEndTimeBaseline(normalEndDateEndStr);
+//        if (endTimeTimestamp > normalEndDateEnd || endTimeTimestamp < normalEndDateBegin) {
+//            jobAnalysis.getCategories().add(JobCategoryEnum.endTimeAbnormal.name());
+//            genBaselineTree(jobAnalysis);
+//        }
     }
 
     public void genBaselineTree(JobAnalysis detectJobAnalysis) throws Exception {
