@@ -16,6 +16,9 @@
 
 package com.oppo.cloud.detect.detector;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 import com.oppo.cloud.common.constant.JobCategoryEnum;
 import com.oppo.cloud.common.constant.TaskStateEnum;
 import com.oppo.cloud.common.domain.opensearch.JobAnalysis;
@@ -33,10 +36,12 @@ public class DurationLong extends DetectServiceImpl {
     @Value("${custom.detectionRule.durationWarning}")
     private Float durationWarning;
 
+    private static final Set<String> EXCLUDED_TASK_TYPES = new HashSet<>(Arrays.asList("DEPENDENT", "SUB_PROCESS"));
+
     @Override
     public void detect(JobAnalysis jobAnalysis) throws Exception {
         // Failed tasks are not subject to the long runtime detection.
-        if (jobAnalysis.getTaskState().equals(TaskStateEnum.fail.name())) {
+        if (jobAnalysis.getTaskState().equals(TaskStateEnum.fail.name()) || EXCLUDED_TASK_TYPES.contains(jobAnalysis.getTaskType().toUpperCase())){
             return;
         }
         if (jobAnalysis.getDuration() >= durationWarning * 3600) {
