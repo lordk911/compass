@@ -64,12 +64,18 @@ custom:
       replicas: 0
     detectIndex:
       name: "compass-detector-app"
+      shards: 1
+      replicas: 0
     gcIndex:
       name: "compass-gc-log"
     yarnIndex:
       name: "compass-yarn-app"
+      shards: 1
+      replicas: 0
     sparkIndex:
       name: "compass-spark-app"
+      shards: 1
+      replicas: 0
     jobInstanceIndex:
       name: "compass-job-instance"
       shards: 1

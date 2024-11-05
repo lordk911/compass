@@ -90,6 +90,33 @@ public class Initializer implements CommandLineRunner {
     @Value(value = "${custom.opensearch.flinkTaskAnalysisIndex.replicas}")
     private Integer flinkTaskAnalysisIndexReplicas;
 
+    @Value(value = "${custom.opensearch.detectIndex.name}")
+    private String detectIndex;
+
+    @Value(value = "${custom.opensearch.detectIndex.shards}")
+    private Integer detectIndexShards;
+
+    @Value(value = "${custom.opensearch.detectIndex.replicas}")
+    private Integer detectIndexReplicas;
+
+    @Value(value = "${custom.opensearch.yarnIndex.name}")
+    private String yarnIndex;
+
+    @Value(value = "${custom.opensearch.yarnIndex.shards}")
+    private Integer yarnIndexShards;
+
+    @Value(value = "${custom.opensearch.yarnIndex.replicas}")
+    private Integer yarnIndexReplicas;
+
+    @Value(value = "${custom.opensearch.sparkIndex.name}")
+    private String sparkIndex;
+
+    @Value(value = "${custom.opensearch.sparkIndex.shards}")
+    private Integer sparkIndexShards;
+
+    @Value(value = "${custom.opensearch.sparkIndex.replicas}")
+    private Integer sparkIndexReplicas;
+
     @Autowired
     @Qualifier("opensearch")
     private RestHighLevelClient client;
@@ -143,5 +170,27 @@ public class Initializer implements CommandLineRunner {
                     new String[]{jobInstanceIndex + "-*"}, mapping, jobInstanceIndexShards, jobInstanceIndexReplicas);
             log.info("Create opensearch template {}, result: {}", jobInstanceIndex, response.isAcknowledged());
         }
+
+        if (!mappingApi.existsTemplate(client, detectIndex)) {
+            Map<String, Object> mapping = JobInstanceMapping.build(true);
+            AcknowledgedResponse response = mappingApi.putTemplate(client, detectIndex,
+                    new String[]{detectIndex + "-*"}, mapping, detectIndexShards, detectIndexReplicas);
+            log.info("Create opensearch template {}, result: {}", detectIndex, response.isAcknowledged());
+        }
+
+        if (!mappingApi.existsTemplate(client, yarnIndex)) {
+            Map<String, Object> mapping = JobInstanceMapping.build(true);
+            AcknowledgedResponse response = mappingApi.putTemplate(client, yarnIndex,
+                    new String[]{yarnIndex + "-*"}, mapping, yarnIndexShards, yarnIndexReplicas);
+            log.info("Create opensearch template {}, result: {}", yarnIndex, response.isAcknowledged());
+        }
+
+        if (!mappingApi.existsTemplate(client, sparkIndex)) {
+            Map<String, Object> mapping = JobInstanceMapping.build(true);
+            AcknowledgedResponse response = mappingApi.putTemplate(client, sparkIndex,
+                    new String[]{sparkIndex + "-*"}, mapping, sparkIndexShards, sparkIndexReplicas);
+            log.info("Create opensearch template {}, result: {}", sparkIndex, response.isAcknowledged());
+        }
+
     }
 }
