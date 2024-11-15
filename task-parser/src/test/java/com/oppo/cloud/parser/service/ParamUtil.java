@@ -141,7 +141,7 @@ public class ParamUtil extends ResourcePreparer {
         executor.setProtocol("hdfs");
         executor.setLogType("executor");
         executor.setLogPathType(LogPathType.DIRECTORY);
-        executor.setLogPath("hdfs://logs-hdfs/tmp/logs/root/logs/application_1673850090992_23147");
+        executor.setLogPath("hdfs://localhost:8020/log/text");
         List<LogPath> executorList = new ArrayList<>();
         executorList.add(executor);
 

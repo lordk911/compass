@@ -19,7 +19,6 @@ package com.oppo.cloud.parser.service.job.parser;
 import com.oppo.cloud.common.constant.LogType;
 import com.oppo.cloud.common.domain.job.LogPath;
 import com.oppo.cloud.common.domain.job.LogRecord;
-
 import com.oppo.cloud.parser.domain.job.CommonResult;
 import com.oppo.cloud.parser.domain.job.ParserParam;
 import com.oppo.cloud.parser.domain.job.SparkExecutorLogParserResult;
@@ -31,7 +30,7 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 
-class SparkExecutorLogParserTest extends ResourcePreparer {
+class SparkDriverLogParserTest extends ResourcePreparer {
 
     @Test
     void run() {
@@ -39,15 +38,15 @@ class SparkExecutorLogParserTest extends ResourcePreparer {
         Map<String, List<LogPath>> logPathMap = logRecord.getApps().get(0).getLogInfoList().get(1).getLogPathMap();
 
         ParserParam param = new ParserParam(
-                LogType.SPARK_EXECUTOR.getName(),
+                LogType.SPARK_DRIVER.getName(),
                 logRecord, logRecord.getApps().get(0),
-                logPathMap.get(LogType.SPARK_EXECUTOR.getName())
+                logPathMap.get(LogType.SPARK_DRIVER.getName())
         );
 
         SimpleParserFactory simpleParserFactory = new SimpleParserFactory();
         SparkExecutorLogParser parser = new SparkExecutorLogParser(param,
                 simpleParserFactory.createLogReaderFactory(),
-                simpleParserFactory.getParserActions(LogType.SPARK_EXECUTOR),
+                simpleParserFactory.getParserActions(LogType.SPARK_DRIVER),
                 simpleParserFactory.getParserResultSink(),
                 simpleParserFactory.getTaskExecutor(),
                 simpleParserFactory.getJvmList());
@@ -56,6 +55,6 @@ class SparkExecutorLogParserTest extends ResourcePreparer {
         Assertions.assertTrue(results.size() == 1);
         SparkExecutorLogParserResult result = results.get(0);
         Assertions.assertTrue(result.getActionMap().size() == 1);
-        Assertions.assertTrue(result.getActionMap().containsKey("outOfMemoryError"));
+        Assertions.assertTrue(result.getActionMap().containsKey("jobFailedOrAbortedException"));
     }
 }
