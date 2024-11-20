@@ -1,5 +1,47 @@
-23/06/08 19:24:12 INFO org.apache.spark.SparkException: Job aborted due to stage failure: Could not execute broadcast in 300 secs: java
-23/06/08 19:24:34 INFO org.apache.spark.SparkException: Job aborted due to stage failure: File does not exist some info
-23/06/08 19:24:55 INFO org.apache.spark.SparkException: Job aborted due to stage failure: Total size of serialized results of 9478 tasks (1024.1 MiB) is bigger than spark.driver.maxResultSize (1024.0 MiB)
-24/10/09 14:30:25 ERROR PolicyRefresher: class org.apache.spark.sql.catalyst.plans.logical.ShowNamespaces is not supported yet. Please contact datahub team for further support.
-end
+24/11/15 10:18:16 INFO TaskMemoryManager: 1660977152 bytes of memory are used for execution and 2677055 bytes of memory are used for storage
+24/11/15 10:18:16 ERROR UnsafeShuffleWriter: In addition to a failure during writing, we failed during cleanup.
+java.lang.NullPointerException
+	at org.apache.spark.shuffle.sort.ShuffleInMemorySorter.getMemoryUsage(ShuffleInMemorySorter.java:131)
+	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.getMemoryUsage(ShuffleExternalSorter.java:305)
+	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.updatePeakMemoryUsed(ShuffleExternalSorter.java:309)
+	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.freeMemory(ShuffleExternalSorter.java:324)
+	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.cleanupResources(ShuffleExternalSorter.java:340)
+	at org.apache.spark.shuffle.sort.UnsafeShuffleWriter.write(UnsafeShuffleWriter.java:187)
+	at org.apache.spark.shuffle.ShuffleWriteProcessor.write(ShuffleWriteProcessor.scala:59)
+	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:99)
+	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:52)
+	at org.apache.spark.scheduler.Task.run(Task.scala:136)
+	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$3(Executor.scala:548)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1504)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:551)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+24/11/15 10:18:16 ERROR Executor: Exception in task 0.0 in stage 18.0 (TID 287)
+org.apache.spark.memory.SparkOutOfMemoryError: Unable to acquire 32768 bytes of memory, got 0
+	at org.apache.spark.memory.MemoryConsumer.throwOom(MemoryConsumer.java:158)
+	at org.apache.spark.memory.MemoryConsumer.allocateArray(MemoryConsumer.java:97)
+	at org.apache.spark.shuffle.sort.ShuffleInMemorySorter.reset(ShuffleInMemorySorter.java:107)
+	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.spill(ShuffleExternalSorter.java:292)
+	at org.apache.spark.memory.TaskMemoryManager.trySpillAndAcquire(TaskMemoryManager.java:221)
+	at org.apache.spark.memory.TaskMemoryManager.acquireExecutionMemory(TaskMemoryManager.java:188)
+	at org.apache.spark.memory.TaskMemoryManager.allocatePage(TaskMemoryManager.java:306)
+	at org.apache.spark.memory.MemoryConsumer.allocatePage(MemoryConsumer.java:116)
+	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.acquireNewPageIfNecessary(ShuffleExternalSorter.java:399)
+	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.insertRecord(ShuffleExternalSorter.java:423)
+	at org.apache.spark.shuffle.sort.UnsafeShuffleWriter.insertRecordIntoSorter(UnsafeShuffleWriter.java:250)
+	at org.apache.spark.shuffle.sort.UnsafeShuffleWriter.write(UnsafeShuffleWriter.java:180)
+	at org.apache.spark.shuffle.ShuffleWriteProcessor.write(ShuffleWriteProcessor.scala:59)
+	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:99)
+	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:52)
+	at org.apache.spark.scheduler.Task.run(Task.scala:136)
+	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$3(Executor.scala:548)
+	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1504)
+	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:551)
+	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
+	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
+	at java.lang.Thread.run(Thread.java:750)
+24/11/15 10:18:16 INFO CodeGenerator: Code generated in 8.804099 ms
+24/11/15 10:18:26 INFO Executor: Finished task 1.0 in stage 30.0 (TID 292). 12509 bytes result sent to driver
+24/11/15 10:19:17 INFO YarnCoarseGrainedExecutorBackend: Got assigned task 299
+24/11/15 10:19:17 INFO Executor: Running task 4.0 in stage 34.0 (TID 299)
