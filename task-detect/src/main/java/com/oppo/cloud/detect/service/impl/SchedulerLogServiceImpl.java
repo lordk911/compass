@@ -46,49 +46,17 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
     private TaskApplicationMapper taskApplicationMapper;
 
     @Override
+    // 这里不需要再重试了，因为是先获取application id, 如果获取不到就会重试
     public List<String> getSchedulerLog(String projectName, String flowName, String taskName, Date executionDate,
                                         Integer tryNum) {
-        int maxRetries = 5;
-        long delayMs = 60000; // 1 second delay
-
-        for (int attempt = 0; attempt < maxRetries; attempt++) {
-            List<String> result = tryGetSchedulerLog(projectName, flowName, taskName, executionDate, tryNum);
-            if (result != null) {
-                return result;
-            }
-
-            if (attempt < maxRetries - 1) {
-                try {
-                    TimeUnit.MILLISECONDS.sleep(delayMs);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    log.error("Sleep interrupted", e);
-                }
-                log.info("Retrying getSchedulerLog (attempt {}/{})", attempt + 2, maxRetries);
-            }
-        }
-
-        log.error(
-                "Failed to find scheduler log after {} attempts. taskName:{}, flowName:{}, executionDate:{}, tryNum:{}",
-                maxRetries, taskName, flowName, executionDate, tryNum);
-        return null;
-    }
-
-    private List<String> tryGetSchedulerLog(String projectName, String flowName, String taskName, Date executionDate,
-                                            Integer tryNum) {
         TaskApplicationExample taskApplicationExample = new TaskApplicationExample();
         taskApplicationExample.createCriteria()
                 .andProjectNameEqualTo(projectName)
                 .andFlowNameEqualTo(flowName)
                 .andTaskNameEqualTo(taskName)
-                .andExecuteTimeEqualTo(new java.sql.Timestamp(executionDate.getTime()));
+                .andExecuteTimeEqualTo(executionDate);
         List<TaskApplication> taskApplicationList =
                 taskApplicationMapper.selectByExampleWithBLOBs(taskApplicationExample);
-        
-        log.debug("Query parameters: projectName={}, flowName={}, taskName={}, executionDate={}, tryNum={}",
-                  projectName, flowName, taskName, executionDate, tryNum);
-        log.debug("Query result size: {}", taskApplicationList.size());
-        
         if (taskApplicationList.size() != 0) {
             TaskApplication taskApplication = null;
             for (TaskApplication temp : taskApplicationList) {
@@ -106,6 +74,9 @@ public class SchedulerLogServiceImpl implements SchedulerLogService {
                 return Arrays.asList(taskApplication.getLogPath().split(","));
             }
         }
+        log.error(
+                "can not find scheduler log from task_application,taskName:{},flowName:{}, executionDate:{}, tryNum:{}",
+                taskName, flowName, executionDate, tryNum);
         return null;
     }
 }
