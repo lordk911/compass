@@ -108,7 +108,7 @@ public class DelayedTask implements CommandLineRunner {
         while (true) {
             try {
                 List<DelayedTaskInfo> delayedTaskInfoList = delayedTaskService.getDelayedTasks();
-                if (delayedTaskInfoList == null) {
+                if (delayedTaskInfoList == null) { // 每次调用完会停止 delaySeconds * 1000 = 60 秒,因为调用时delayQueue被清空
                     Thread.sleep(delaySeconds * 1000);
                     continue;
                 }
@@ -199,7 +199,7 @@ public class DelayedTask implements CommandLineRunner {
         AbnormalTaskAppInfo abnormalTaskAppInfo = taskAppService
                 .getAbnormalTaskAppsInfo(delayedTaskInfo.getJobAnalysis(), delayedTaskInfo.getHandledApps());
 
-        if (!"".equals(abnormalTaskAppInfo.getExceptionInfo())) {
+        if (!"".equals(abnormalTaskAppInfo.getExceptionInfo())) { // 如果关联不到appid 放回等待队列
             // Construct the complete appId information before sending, or retain the fallback information for the last retry.
             if (delayedTaskInfo.getProcessRetries() != tryTimes - 1) {
                 delayedTaskInfo.setProcessRetries(delayedTaskInfo.getProcessRetries() + 1);

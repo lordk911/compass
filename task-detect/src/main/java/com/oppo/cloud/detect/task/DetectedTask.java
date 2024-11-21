@@ -50,7 +50,7 @@ public class DetectedTask {
     @Value("${custom.schedulerType}")
     private String schedulerType;
     @Resource
-    private List<DetectService> abnormalDetects;
+    private List<DetectService> abnormalDetectors;
 
     @Resource(name = ThreadPoolConfig.DETECT_EXECUTOR_POOL)
     private Executor detectExecutorPool;
@@ -168,7 +168,7 @@ public class DetectedTask {
         jobAnalysis.setRetryTimes(TryNumberUtil.updateTryNumber(jobAnalysis.getRetryTimes(),schedulerType));
 
         // Exception task detection.
-        for (DetectService detectService : abnormalDetects) {
+        for (DetectService detectService : abnormalDetectors) {
             try {
                 detectService.detect(jobAnalysis);
             } catch (Exception e) {
@@ -179,10 +179,10 @@ public class DetectedTask {
         try {
             if (jobAnalysis.getCategories().size() == 0) {
                 // Normal job task processing.
-                abnormalDetects.get(0).handleNormalJob(jobAnalysis);
+                abnormalDetectors.get(0).handleNormalJob(jobAnalysis);
             } else {
                 // Exception job task processing.
-                abnormalDetects.get(0).handleAbnormalJob(jobAnalysis);
+                abnormalDetectors.get(0).handleAbnormalJob(jobAnalysis);
             }
         } catch (Exception e) {
             log.error("handle job failed: ", e);
