@@ -1,47 +1,22 @@
-24/11/15 10:18:16 INFO TaskMemoryManager: 1660977152 bytes of memory are used for execution and 2677055 bytes of memory are used for storage
-24/11/15 10:18:16 ERROR UnsafeShuffleWriter: In addition to a failure during writing, we failed during cleanup.
-java.lang.NullPointerException
-	at org.apache.spark.shuffle.sort.ShuffleInMemorySorter.getMemoryUsage(ShuffleInMemorySorter.java:131)
-	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.getMemoryUsage(ShuffleExternalSorter.java:305)
-	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.updatePeakMemoryUsed(ShuffleExternalSorter.java:309)
-	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.freeMemory(ShuffleExternalSorter.java:324)
-	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.cleanupResources(ShuffleExternalSorter.java:340)
-	at org.apache.spark.shuffle.sort.UnsafeShuffleWriter.write(UnsafeShuffleWriter.java:187)
-	at org.apache.spark.shuffle.ShuffleWriteProcessor.write(ShuffleWriteProcessor.scala:59)
-	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:99)
-	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:52)
-	at org.apache.spark.scheduler.Task.run(Task.scala:136)
-	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$3(Executor.scala:548)
-	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1504)
-	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:551)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	at java.lang.Thread.run(Thread.java:750)
-24/11/15 10:18:16 ERROR Executor: Exception in task 0.0 in stage 18.0 (TID 287)
-org.apache.spark.memory.SparkOutOfMemoryError: Unable to acquire 32768 bytes of memory, got 0
-	at org.apache.spark.memory.MemoryConsumer.throwOom(MemoryConsumer.java:158)
-	at org.apache.spark.memory.MemoryConsumer.allocateArray(MemoryConsumer.java:97)
-	at org.apache.spark.shuffle.sort.ShuffleInMemorySorter.reset(ShuffleInMemorySorter.java:107)
-	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.spill(ShuffleExternalSorter.java:292)
-	at org.apache.spark.memory.TaskMemoryManager.trySpillAndAcquire(TaskMemoryManager.java:221)
-	at org.apache.spark.memory.TaskMemoryManager.acquireExecutionMemory(TaskMemoryManager.java:188)
-	at org.apache.spark.memory.TaskMemoryManager.allocatePage(TaskMemoryManager.java:306)
-	at org.apache.spark.memory.MemoryConsumer.allocatePage(MemoryConsumer.java:116)
-	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.acquireNewPageIfNecessary(ShuffleExternalSorter.java:399)
-	at org.apache.spark.shuffle.sort.ShuffleExternalSorter.insertRecord(ShuffleExternalSorter.java:423)
-	at org.apache.spark.shuffle.sort.UnsafeShuffleWriter.insertRecordIntoSorter(UnsafeShuffleWriter.java:250)
-	at org.apache.spark.shuffle.sort.UnsafeShuffleWriter.write(UnsafeShuffleWriter.java:180)
-	at org.apache.spark.shuffle.ShuffleWriteProcessor.write(ShuffleWriteProcessor.scala:59)
-	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:99)
-	at org.apache.spark.scheduler.ShuffleMapTask.runTask(ShuffleMapTask.scala:52)
-	at org.apache.spark.scheduler.Task.run(Task.scala:136)
-	at org.apache.spark.executor.Executor$TaskRunner.$anonfun$run$3(Executor.scala:548)
-	at org.apache.spark.util.Utils$.tryWithSafeFinally(Utils.scala:1504)
-	at org.apache.spark.executor.Executor$TaskRunner.run(Executor.scala:551)
-	at java.util.concurrent.ThreadPoolExecutor.runWorker(ThreadPoolExecutor.java:1149)
-	at java.util.concurrent.ThreadPoolExecutor$Worker.run(ThreadPoolExecutor.java:624)
-	at java.lang.Thread.run(Thread.java:750)
-24/11/15 10:18:16 INFO CodeGenerator: Code generated in 8.804099 ms
-24/11/15 10:18:26 INFO Executor: Finished task 1.0 in stage 30.0 (TID 292). 12509 bytes result sent to driver
-24/11/15 10:19:17 INFO YarnCoarseGrainedExecutorBackend: Got assigned task 299
-24/11/15 10:19:17 INFO Executor: Running task 4.0 in stage 34.0 (TID 299)
+find -L . -maxdepth 5 -ls 1>>"/var/yarn/log/application_1732263167879_19357/container_e134_1732263167879_19357_01_000004/directory.info"
+echo "broken symlinks(find -L . -maxdepth 5 -type l -ls):" 1>>"/var/yarn/log/application_1732263167879_19357/container_e134_1732263167879_19357_01_000004/directory.info"
+find -L . -maxdepth 5 -type l -ls 1>>"/var/yarn/log/application_1732263167879_19357/container_e134_1732263167879_19357_01_000004/directory.info"
+echo "Launching container"
+exec /bin/bash -c "LD_LIBRARY_PATH=\"/usr/hdp/current/hadoop-client/lib/native:/lib64:$LD_LIBRARY_PATH\" $JAVA_HOME/bin/java -server -Xmx6144m '-XX:+PrintGCDetails' '-XX:+PrintGCDateStamps' '-XX:+IgnoreUnrecognizedVMOptions' '--add-opens=java.base/java.lang=ALL-UNNAMED' '--add-opens=java.base/java.lang.invoke=ALL-UNNAMED' '--add-opens=java.base/java.lang.reflect=ALL-UNNAMED' '--add-opens=java.base/java.io=ALL-UNNAMED' '--add-opens=java.base/java.net=ALL-UNNAMED' '--add-opens=java.base/java.nio=ALL-UNNAMED' '--add-opens=java.base/java.util=ALL-UNNAMED' '--add-opens=java.base/java.util.concurrent=ALL-UNNAMED' '--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED' '--add-opens=java.base/sun.nio.ch=ALL-UNNAMED' '--add-opens=java.base/sun.nio.cs=ALL-UNNAMED' '--add-opens=java.base/sun.security.action=ALL-UNNAMED' '--add-opens=java.base/sun.util.calendar=ALL-UNNAMED' '--add-opens=java.security.jgss/sun.security.krb5=ALL-UNNAMED' '-XX:+PrintGCDetails' '-XX:+PrintGCDateStamps' '-XX:+UseNUMA' -Djava.io.tmpdir=$PWD/tmp '-Dspark.history.ui.port=18081' '-Dspark.driver.port=41812' '-Dspark.port.maxRetries=50' '-Dspark.network.timeout=180s' -Dspark.yarn.app.container.log.dir=/var/yarn/log/application_1732263167879_19357/container_e134_1732263167879_19357_01_000004 -XX:OnOutOfMemoryError='kill %p' org.apache.spark.executor.YarnCoarseGrainedExecutorBackend --driver-url spark://CoarseGrainedScheduler@client-10-0-161-29:41812 --executor-id 3 --hostname worker-10-0-161-23 --cores 1 --app-id application_1732263167879_19357 --resourceProfileId 0 1>/var/yarn/log/application_1732263167879_19357/container_e134_1732263167879_19357_01_000004/stdout 2>/var/yarn/log/application_1732263167879_19357/container_e134_1732263167879_19357_01_000004/stderr"
+^@^Mprelaunch.err^@^A0^@^Mprelaunch.out^@^C100Setting up env variables
+Setting up job resources
+Copying debugging information
+Launching container
+^@^Fstderr^@^D521924/11/26 11:30:27 INFO CoarseGrainedExecutorBackend: Started daemon with process name: 269220@worker-10-0-161-23
+24/11/26 11:30:27 INFO SignalUtils: Registering signal handler for TERM
+24/11/26 11:30:27 INFO SignalUtils: Registering signal handler for HUP
+24/11/26 11:30:27 INFO SignalUtils: Registering signal handler for INT
+24/11/26 11:30:27 INFO SecurityManager: Changing view acls to: yarn,fuy-n
+24/11/26 11:30:27 INFO SecurityManager: Changing modify acls to: yarn,fuy-n
+24/11/26 11:30:27 INFO SecurityManager: Changing view acls groups to:
+24/11/26 11:30:27 INFO SecurityManager: Changing modify acls groups to:
+24/11/26 11:30:27 INFO SecurityManager: SecurityManager: authentication disabled; ui acls disabled; users  with view permissions: Set(yarn, fuy-n); groups with view permissions: Set(); users  with modify permissions: Set(yarn, fuy-n); groups with modify permissions: Set()
+24/11/26 11:30:28 INFO TransportClientFactory: Successfully created connection to client-10-0-161-29/10.0.161.29:41812 after 82 ms (0 ms spent in bootstraps)
+24/11/26 11:30:28 INFO SecurityManager: Changing view acls to: yarn,fuy-n
+24/11/26 11:30:28 INFO SecurityManager: Changing modify acls to: yarn,fuy-n
+24/11/26 11:30:28 INFO SecurityManager: Changing view acls groups to:
