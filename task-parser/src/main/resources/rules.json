@@ -233,7 +233,7 @@
         "parserType": "DEFAULT",
         "parserTemplate": {
           "heads": [
-            "^(?<datetime>\\d{2,4}.\\d{2}.\\d{2}\\D+\\d{2}:\\d{2}:\\d{2}).+OutOfMemoryError.+$"
+            "^(?<datetime>\\d{2,4}.\\d{2}.\\d{2}\\D+\\d{2}:\\d{2}:\\d{2}).+OutOfMemoryError(?!.*OnOutOfMemoryError).+$"
           ],
           "middles": [],
           "tails": [
