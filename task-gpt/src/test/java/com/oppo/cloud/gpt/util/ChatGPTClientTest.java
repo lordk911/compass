@@ -30,7 +30,7 @@ class ChatGPTClientTest {
     private ChatGPTClient chatGPTClient;
     private static final String TEST_API_KEY = "sk-123";
     private static final String TEST_PROXY = "http://10.9.27.41:9997/";
-    private static final String TEST_MODEL = "qwen2-7B-instruct";
+    private static final String TEST_MODEL = "qwen2.5-7B-instruct";
 
     @BeforeEach
     void setUp() {
